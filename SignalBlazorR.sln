@@ -9,8 +9,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SignalBlazorR.Client", "Sig
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SignalBlazorR.Shared", "SignalBlazorR\SignalBlazorR.Shared\SignalBlazorR.Shared.csproj", "{421A487A-6DEE-4240-96AF-A087A608906E}"
 EndProject
-Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{D1B4F9F7-8018-4707-8963-94543E2D0865}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,10 +27,6 @@ Global
 		{421A487A-6DEE-4240-96AF-A087A608906E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{421A487A-6DEE-4240-96AF-A087A608906E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{421A487A-6DEE-4240-96AF-A087A608906E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D1B4F9F7-8018-4707-8963-94543E2D0865}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D1B4F9F7-8018-4707-8963-94543E2D0865}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D1B4F9F7-8018-4707-8963-94543E2D0865}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D1B4F9F7-8018-4707-8963-94543E2D0865}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

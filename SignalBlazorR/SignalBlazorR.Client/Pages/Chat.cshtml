@@ -1,7 +1,7 @@
 ﻿@using SignalBlazorR.Shared;
+@using Microsoft.AspNetCore.Blazor;
 @using Microsoft.AspNetCore.Blazor.Browser.Interop;
 @using Newtonsoft.Json;
-@using System.Web;
 @page "/chat"
 
 <h1>ちゃっとてすと</h1>
@@ -32,7 +32,7 @@
 
 <script>
 
-		// コネクション作成
+	// コネクション作成
 	let connection = new signalR.HubConnection('/chathub');
 
 	// 受信処理
@@ -88,7 +88,7 @@
 		this.Assembly = this.GetType().Assembly.GetName().Name;
 		this.NameSpace = this.GetType().Namespace;
 		this.Type = this.GetType().Name;
-		Console.WriteLine($"Assembly={Assembly}\r\nNameSpace={NameSpace}\r\nType={Type}");
+		Console.Out.WriteLine($"Assembly={Assembly}\r\nNameSpace={NameSpace}\r\nType={Type}");
 	}
 
 	protected void 発言()
@@ -98,8 +98,12 @@
 
 	public static bool jusin(string smsg)
 	{
-		RegisteredFunction.Invoke<bool>("log", "「jusin」よばれたー");
-		var msg = JsonConvert.DeserializeObject<SimpleMessage>(smsg);
+		//RegisteredFunction.Invoke<bool>("log", $"「jusin」よばれたー\r\n{smsg}");
+		Console.Out.WriteLine($"smsg「{smsg}」");
+		//var msg = JsonConvert.DeserializeObject<SimpleMessage>(smsg);
+		var msg = JsonUtil.Deserialize<SimpleMessage>(smsg);
+		//Console.Out.WriteLine($"smsg「{smsg}」2");
+		Console.Out.WriteLine($"msg.name「{msg.name}」msg.message「{msg.message}」");
 		myIns.AddMessage(msg);
 		return true;
 	}
