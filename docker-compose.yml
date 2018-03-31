@@ -1,8 +1,0 @@
-version: '3.4'
-
-services:
-  signalblazorr.server:
-    image: ${DOCKER_REGISTRY}signalblazorrserver
-    build:
-      context: .
-      dockerfile: SignalBlazorR/SignalBlazorR.Server/Dockerfile
