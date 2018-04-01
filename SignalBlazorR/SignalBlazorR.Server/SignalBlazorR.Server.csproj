@@ -7,8 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Properties\PublishProfiles\SignalBlazorRServer20180327020648.pubxml" />
-    <None Remove="Properties\PublishProfiles\SignalBlazorRServer20180327031250.pubxml" />
+    <None Include="Properties\PublishProfiles\FolderProfile.pubxml.user" />
+    <None Include="Properties\PublishProfiles\https___blazor001.arukascloud.io.pubxml.user" />
+    <None Include="Properties\PublishProfiles\SignalBlazorRServer20180328124450 - Web Deploy.pubxml.user" />
   </ItemGroup>
 
   <ItemGroup>
