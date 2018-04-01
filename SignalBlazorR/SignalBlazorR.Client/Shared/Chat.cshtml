@@ -1,13 +1,13 @@
 ﻿@using SignalBlazorR.Shared;
 @using Microsoft.AspNetCore.Blazor;
 @using Microsoft.AspNetCore.Blazor.Browser.Interop;
-@page "/chat"
-
-<h1>ちゃっとてすと</h1>
 
 <p>
-	<input type="text" @bind(Msg.name)><br />
-	<input type="text" @bind(Msg.message)><br />
+	名前：<input type="text" @bind(Msg.name)><br />
+	発言：<input type="text" @bind(Msg.message)><br />
+	<label>
+		<input type="checkbox" @bind(IsAll) />全体発言する？
+	</label>
 	<button @onclick(発言)>はつげん</button><br />
 </p>
 
@@ -21,10 +21,10 @@
 	<tbody>
 		@foreach (var Message in MessageList)
 		{
-			<tr>
-				<td>@Message.name</td>
-				<td>@Message.message</td>
-			</tr>
+		<tr>
+			<td>@Message.name</td>
+			<td>@Message.message</td>
+		</tr>
 		}
 	</tbody>
 </table>
@@ -42,7 +42,7 @@
 		}
 		let AddMessageSMethod = Blazor.platform.findMethod(
 			"SignalBlazorR.Client",
-			"SignalBlazorR.Client.Pages",
+			"SignalBlazorR.Client.Shared",
 			"Chat",
 			"jusin"
 		);
@@ -52,6 +52,21 @@
 		Blazor.platform.callMethod(AddMessageSMethod, null, [ts]);
 	});
 
+	// グループ追加処理
+	Blazor.registerFunction("グループ追加", Msg => {
+		console.log(`グループ追加「${Msg.room}」`);
+		connection.invoke("JoinGroup", Msg)
+			.catch(e => console.log(e));
+		return true;
+	});
+
+	// グループ離脱処理
+	Blazor.registerFunction("グループ離脱", Msg => {
+		connection.invoke("LeaveGroup", Msg)
+			.catch(e => console.log(e));
+		return true;
+	});
+
 	// 送信処理
 	Blazor.registerFunction("迷信", Msg => {
 		connection.invoke("PostMessage", Msg)
@@ -59,20 +74,27 @@
 		return true;
 	});
 
-	// ログ出力
-	Blazor.registerFunction("log", Msg => {
-		console.log(Msg);
-		return true;
-	});
-
 	// 接続開始
-	connection.start().catch(e => console.log(e));
+	connection.start()
+		.then(function () {
+			console.log("ルーム参加");
+			var InitMethod = Blazor.platform.findMethod(
+				"SignalBlazorR.Client",
+				"SignalBlazorR.Client.Shared",
+				"Chat",
+				"JsInited"
+			);
+			Blazor.platform.callMethod(InitMethod, null, []);
+
+		})
+		.catch(e => console.log(e));
+
 
 </script>
 
 @functions {
 
-	SimpleMessage Msg = new SimpleMessage();
+	public SimpleMessage Msg = new SimpleMessage();
 	List<SimpleMessage> MessageList = new List<SimpleMessage>();
 
 	public static Chat myIns;
@@ -81,6 +103,8 @@
 	string NameSpace { get; set; }
 	string Type { get; set; }
 
+	bool IsAll { get; set; } = false;
+
 	protected override void OnInit()
 	{
 		myIns = this;
@@ -88,11 +112,27 @@
 		this.NameSpace = this.GetType().Namespace;
 		this.Type = this.GetType().Name;
 		Console.Out.WriteLine($"Assembly={Assembly}\r\nNameSpace={NameSpace}\r\nType={Type}");
+		var url = new Microsoft.AspNetCore.Blazor.Browser.Services.BrowserUriHelper().GetAbsoluteUri();
+		url = $"{url}{(url.EndsWith("/") ? "index" : string.Empty)}";
+		var uri = new Uri(url);
+		Msg.room = uri.AbsolutePath;
+		Console.Out.WriteLine($"Room={Msg.room}");
 	}
 
 	protected void 発言()
 	{
-		RegisteredFunction.Invoke<bool>("迷信", Msg);
+		var sndMsg = this.Msg.Clone();
+		if(this.IsAll)
+		{
+			sndMsg.room = SimpleMessage.AllGroup;
+		}
+		RegisteredFunction.Invoke<bool>("迷信", sndMsg);
+	}
+
+	public static bool JsInited()
+	{
+		RegisteredFunction.Invoke<bool>("グループ追加", myIns.Msg);
+		return true;
 	}
 
 	public static bool jusin(string smsg)
@@ -109,7 +149,6 @@
 
 	public void AddMessage(SimpleMessage smsg)
 	{
-		RegisteredFunction.Invoke<bool>("log", "「AddMessage」よばれたー");
 		this.MessageList.Add(smsg);
 		Console.Out.WriteLine("「AddMessage」よばれたー");
 		// 手動での更新通知
