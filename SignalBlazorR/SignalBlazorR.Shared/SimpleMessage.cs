@@ -6,7 +6,7 @@ namespace SignalBlazorR.Shared
 {
 	public class SimpleMessage
 	{
-		public string room { get; set; }
+		public string room { get; set; } = string.Empty;
 		public string name { get; set; } = string.Empty;
 		public string message { get; set; } = string.Empty;
 
