@@ -21,13 +21,13 @@ namespace SignalBlazorR.Server.Hub
 		public async Task JoinGroup(SimpleMessage msg)
 		{
 			await Groups.AddAsync(Context.ConnectionId, msg.room);
-			msg.message = "＜グループに参加しました》";
+			msg.message = $"＜「{msg.room}」グループに参加しました＞";
 			await Clients.Group(msg.room).SendAsync("AddMessage", msg);
 		}
 
 		public async Task LeaveGroup(SimpleMessage msg)
 		{
-			msg.message = "＜グループから離脱しました＞";
+			msg.message = $"＜「{msg.room}」グループから離脱しました＞";
 			await Clients.Group(msg.room).SendAsync("AddMessage", msg);
 			await Groups.RemoveAsync(Context.ConnectionId, msg.room);
 		}
