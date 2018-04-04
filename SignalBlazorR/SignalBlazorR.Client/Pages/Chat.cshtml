@@ -29,7 +29,7 @@
 	</tbody>
 </table>
 
-<script>
+@*<script>
 
 	// コネクション作成
 	let connection = new signalR.HubConnection('/chathub');
@@ -68,7 +68,7 @@
 	// 接続開始
 	connection.start().catch(e => console.log(e));
 
-</script>
+</script>*@
 
 @functions {
 
@@ -88,6 +88,15 @@
 		this.NameSpace = this.GetType().Namespace;
 		this.Type = this.GetType().Name;
 		Console.Out.WriteLine($"Assembly={Assembly}\r\nNameSpace={NameSpace}\r\nType={Type}");
+
+		var url = new Microsoft.AspNetCore.Blazor.Browser.Services.BrowserUriHelper().GetAbsoluteUri();
+		url = $"{url}{(url.EndsWith("/") ? "index" : string.Empty)}";
+		var uri = new Uri(url);
+
+		Msg.room = uri.AbsolutePath;
+		RegisteredFunction.Invoke<bool>("グループ追加", Msg);
+
+		Console.Out.WriteLine($"Room={Msg.room}");
 	}
 
 	protected void 発言()
@@ -109,7 +118,7 @@
 
 	public void AddMessage(SimpleMessage smsg)
 	{
-		RegisteredFunction.Invoke<bool>("log", "「AddMessage」よばれたー");
+		//RegisteredFunction.Invoke<bool>("log", "「AddMessage」よばれたー");
 		this.MessageList.Add(smsg);
 		Console.Out.WriteLine("「AddMessage」よばれたー");
 		// 手動での更新通知
