@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="Pages\Chat.cshtml" />
+    <None Include="Shared\Chat.cshtml" />
   </ItemGroup>
 
 </Project>

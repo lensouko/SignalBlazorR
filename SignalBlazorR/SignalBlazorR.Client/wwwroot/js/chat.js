@@ -12,7 +12,7 @@
 		}
 		let AddMessageSMethod = Blazor.platform.findMethod(
 			"SignalBlazorR.Client",
-			"SignalBlazorR.Client.Pages",
+			"SignalBlazorR.Client.Shared",
 			"Chat",
 			"jusin"
 		);
