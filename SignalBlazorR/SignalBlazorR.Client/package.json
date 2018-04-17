@@ -1,0 +1,22 @@
+{
+  "name": "myproject",
+  "version": "1.0.0",
+  "dependencies":
+  {
+    "@aspnet/signalr": "^1.0.0-preview2-final"
+  },
+  "-vs-binding":
+  {
+    "BeforeBuild":
+    [
+      "update"
+    ]
+  },
+  "scripts":
+  {
+    "build": "npm-run-all build:*",
+    "build:clean": "rimraf ./wwwroot/js/lib/*",
+    "build:clean2": "rimraf ./node_modules/@aspnet/signalr/dist/browser/*",
+    "build:copy": "cpx \"./node_modules/@aspnet/signalr/dist/browser/*.*\" \"./wwwroot/js/lib\""
+  }
+}

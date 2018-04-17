@@ -1,103 +1,109 @@
 ﻿@using SignalBlazorR.Shared;
-@using Microsoft.AspNetCore.Blazor;
 @using Microsoft.AspNetCore.Blazor.Browser.Interop;
+@implements IDisposable
 
 <p>
-	名前：<input type="text" @bind(Msg.name)><br />
-	発言：<input type="text" @bind(Msg.message)><br />
-	<label>
-		<input type="checkbox" @bind(IsAll) />全体発言する？
-	</label>
-	<button @onclick(発言)>はつげん</button><br />
+    名前：<input type="text" bind="Msg.name" /><br />
+    発言：<input type="text" bind="Msg.message" /><br />
+    <label>
+        <input type="checkbox" bind="IsAll" title="あああ" />全体発言する？
+    </label>
+    <button onclick="@発言">はつげん</button><br />
 </p>
 <p>@Msg.room</p>
 <table class='table'>
-	<thead>
-		<tr>
-			<th>名前</th>
-			<th>発言</th>
-		</tr>
-	</thead>
-	<tbody>
-		@foreach (var Message in MessageList)
-		{
-		<tr>
-			<td>@Message.name</td>
-			<td>@Message.message</td>
-		</tr>
-		}
-	</tbody>
+    <thead>
+        <tr>
+            <th>名前</th>
+            <th>発言</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var Message in MessageList)
+        {
+            <tr>
+                <td>@Message.name</td>
+                <td>@Message.message</td>
+            </tr>
+        }
+    </tbody>
 </table>
 
 @functions {
 
-	public static SimpleMessage Msg = new SimpleMessage();
-	public static List<SimpleMessage> MessageList = new List<SimpleMessage>();
+    public static SimpleMessage Msg = new SimpleMessage();
+    public static List<SimpleMessage> MessageList = new List<SimpleMessage>();
 
-	public static Chat myIns;
+    public static Chat myIns;
 
-	string Assembly { get; set; }
-	string NameSpace { get; set; }
-	string Type { get; set; }
+    string Assembly { get; set; }
+    string NameSpace { get; set; }
+    string Type { get; set; }
 
-	bool IsAll { get; set; } = false;
+    bool IsAll { get; set; } = false;
 
-	protected override void OnInit()
-	{
-		myIns = this;
-		this.Assembly = this.GetType().Assembly.GetName().Name;
-		this.NameSpace = this.GetType().Namespace;
-		this.Type = this.GetType().Name;
-		Console.Out.WriteLine($"Assembly={Assembly}\r\nNameSpace={NameSpace}\r\nType={Type}");
-		var url = new Microsoft.AspNetCore.Blazor.Browser.Services.BrowserUriHelper().GetAbsoluteUri();
-		url = $"{url}{(url.EndsWith("/") ? "index" : string.Empty)}";
-		var uri = new Uri(url);
+    protected override void OnInit()
+    {
+        myIns = this;
+        this.Assembly = this.GetType().Assembly.GetName().Name;
+        this.NameSpace = this.GetType().Namespace;
+        this.Type = this.GetType().Name;
+        Console.Out.WriteLine($"Assembly={Assembly}\r\nNameSpace={NameSpace}\r\nType={Type}");
+        var url = new Microsoft.AspNetCore.Blazor.Browser.Services.BrowserUriHelper().GetAbsoluteUri();
+        url = $"{url}{(url.EndsWith("/") ? "index" : string.Empty)}";
+        var uri = new Uri(url);
 
-		if (Msg.room != uri.AbsolutePath)
-		{
-			if (!string.IsNullOrWhiteSpace(Msg.room))
-			{
-				RegisteredFunction.Invoke<bool>("グループ離脱", Msg);
-			}
+        //if (Msg.room != uri.AbsolutePath)
+        {
+            Msg.room = uri.AbsolutePath;
+            RegisteredFunction.Invoke<bool>("グループ追加", Msg);
 
-			Msg.room = uri.AbsolutePath;
-			RegisteredFunction.Invoke<bool>("グループ追加", Msg);
+        }
 
-		}
+        Console.Out.WriteLine($"Room={Msg.room}");
+    }
 
-		Console.Out.WriteLine($"Room={Msg.room}");
-	}
+    public void Dispose()
+    {
 
-	protected void 発言()
-	{
-		var sndMsg = Msg.Clone();
-		if(this.IsAll)
-		{
-			sndMsg.room = SimpleMessage.AllGroup;
-		}
-		RegisteredFunction.Invoke<bool>("迷信", sndMsg);
-	}
+        if (!string.IsNullOrWhiteSpace(Msg.room))
+        {
+            RegisteredFunction.Invoke<bool>("グループ離脱", Msg);
+        }
 
-	public static bool JsInited()
-	{
-		RegisteredFunction.Invoke<bool>("グループ追加", Msg);
-		return true;
-	}
+    }
 
-	public static bool jusin(string smsg)
-	{
-		Console.Out.WriteLine($"smsg「{smsg}」");
-		var msg = JsonUtil.Deserialize<SimpleMessage>(smsg);
-		Console.Out.WriteLine($"msg.name「{msg.name}」msg.message「{msg.message}」");
-		MessageList.Add(msg);
-		myIns.更新通知();
-		return true;
-	}
 
-	public void 更新通知()
-	{
-		// 手動での更新通知
-		this.StateHasChanged();
-	}
+    void 発言()
+    {
+        var sndMsg = Msg.Clone();
+        if (this.IsAll)
+        {
+            sndMsg.room = SimpleMessage.AllGroup;
+        }
+        RegisteredFunction.Invoke<bool>("迷信", sndMsg);
+    }
+
+    public static bool JsInited()
+    {
+        RegisteredFunction.Invoke<bool>("グループ追加", Msg);
+        return true;
+    }
+
+    public static bool jusin(string smsg)
+    {
+        Console.Out.WriteLine($"smsg「{smsg}」");
+        var msg = JsonUtil.Deserialize<SimpleMessage>(smsg);
+        Console.Out.WriteLine($"msg.name「{msg.name}」msg.message「{msg.message}」");
+        MessageList.Add(msg);
+        myIns.更新通知();
+        return true;
+    }
+
+    public void 更新通知()
+    {
+        // 手動での更新通知
+        this.StateHasChanged();
+    }
 
 }
