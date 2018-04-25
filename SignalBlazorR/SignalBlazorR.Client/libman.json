@@ -1,0 +1,11 @@
+{
+  "version": "1.0",
+  "defaultProvider": "filesystem",
+  "defaultDestination": "wwwroot/js/lib",
+  "libraries":
+  [
+    {
+      "library": "node_modules/@aspnet/signalr/dist/browser/"
+    }
+  ]
+}

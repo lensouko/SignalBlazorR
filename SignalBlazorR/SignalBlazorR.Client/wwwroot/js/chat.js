@@ -48,14 +48,6 @@
 	connection.start()
 		.then(function () {
 			console.log("接続開始");
-			//var InitMethod = Blazor.platform.findMethod(
-			//	"SignalBlazorR.Client",
-			//	"SignalBlazorR.Client.Shared",
-			//	"Chat",
-			//	"JsInited"
-			//);
-			//Blazor.platform.callMethod(InitMethod, null, []);
-
 		})
 		.catch(e => console.log(e));
 
