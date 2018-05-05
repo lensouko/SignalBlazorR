@@ -3,3 +3,22 @@
 <h1>Hello, world!</h1>
 
 Welcome to your new app.
+
+<h1 class="display-1" onmouseover="@OnMouseOver" onmouseout="@OnMouseOut">@inOrOut</h1>
+
+
+
+@functions {
+string inOrOut = "OUT";
+
+void OnMouseOver()
+{
+    inOrOut = "IN!";
+}
+
+void OnMouseOut()
+{
+    inOrOut = "OUT";
+}
+}
+

@@ -31,79 +31,79 @@
 
 @functions {
 
-    public static SimpleMessage Msg = new SimpleMessage();
-    public static List<SimpleMessage> MessageList = new List<SimpleMessage>();
+ static SimpleMessage Msg = new SimpleMessage();
+ static List<SimpleMessage> MessageList = new List<SimpleMessage>();
 
-    public static Chat myIns;
+ static Chat myIns;
 
-    string Assembly { get; set; }
-    string NameSpace { get; set; }
-    string Type { get; set; }
+string Assembly { get; set; }
+string NameSpace { get; set; }
+string Type { get; set; }
 
-    bool IsAll { get; set; } = false;
+bool IsAll { get; set; } = false;
 
-    protected override void OnInit()
+protected override void OnInit()
+{
+    myIns = this;
+    this.Assembly = this.GetType().Assembly.GetName().Name;
+    this.NameSpace = this.GetType().Namespace;
+    this.Type = this.GetType().Name;
+    Console.Out.WriteLine($"Assembly={Assembly}\r\nNameSpace={NameSpace}\r\nType={Type}");
+    var url = new Microsoft.AspNetCore.Blazor.Browser.Services.BrowserUriHelper().GetAbsoluteUri();
+    url = $"{url}{(url.EndsWith("/") ? "index" : string.Empty)}";
+    var uri = new Uri(url);
+
+    //if (Msg.room != uri.AbsolutePath)
     {
-        myIns = this;
-        this.Assembly = this.GetType().Assembly.GetName().Name;
-        this.NameSpace = this.GetType().Namespace;
-        this.Type = this.GetType().Name;
-        Console.Out.WriteLine($"Assembly={Assembly}\r\nNameSpace={NameSpace}\r\nType={Type}");
-        var url = new Microsoft.AspNetCore.Blazor.Browser.Services.BrowserUriHelper().GetAbsoluteUri();
-        url = $"{url}{(url.EndsWith("/") ? "index" : string.Empty)}";
-        var uri = new Uri(url);
-
-        //if (Msg.room != uri.AbsolutePath)
-        {
-            Msg.room = uri.AbsolutePath;
-            RegisteredFunction.Invoke<bool>("グループ追加", Msg);
-
-        }
-
-        Console.Out.WriteLine($"Room={Msg.room}");
-    }
-
-    public void Dispose()
-    {
-
-        if (!string.IsNullOrWhiteSpace(Msg.room))
-        {
-            RegisteredFunction.Invoke<bool>("グループ離脱", Msg);
-        }
-
-    }
-
-
-    void 発言()
-    {
-        var sndMsg = Msg.Clone();
-        if (this.IsAll)
-        {
-            sndMsg.room = SimpleMessage.AllGroup;
-        }
-        RegisteredFunction.Invoke<bool>("迷信", sndMsg);
-    }
-
-    public static bool JsInited()
-    {
+        Msg.room = uri.AbsolutePath;
         RegisteredFunction.Invoke<bool>("グループ追加", Msg);
-        return true;
+
     }
 
-    public static bool jusin(string smsg)
+    Console.Out.WriteLine($"Room={Msg.room}");
+}
+
+public void Dispose()
+{
+
+    if (!string.IsNullOrWhiteSpace(Msg.room))
     {
-        Console.Out.WriteLine($"smsg「{smsg}」");
-        var msg = JsonUtil.Deserialize<SimpleMessage>(smsg);
-        Console.Out.WriteLine($"msg.name「{msg.name}」msg.message「{msg.message}」");
-        MessageList.Add(msg);
-        myIns.更新通知();
-        return true;
+        RegisteredFunction.Invoke<bool>("グループ離脱", Msg);
     }
 
-    public void 更新通知()
+}
+
+
+void 発言()
+{
+    var sndMsg = Msg.Clone();
+    if (this.IsAll)
     {
-        // 手動での更新通知
-        this.StateHasChanged();
+        sndMsg.room = SimpleMessage.AllGroup;
     }
+    RegisteredFunction.Invoke<bool>("迷信", sndMsg);
+}
+
+public static bool JsInited()
+{
+    RegisteredFunction.Invoke<bool>("グループ追加", Msg);
+    return true;
+}
+
+public static bool jusin(string smsg)
+{
+    Console.Out.WriteLine($"smsg「{smsg}」");
+    var msg = JsonUtil.Deserialize<SimpleMessage>(smsg);
+    Console.Out.WriteLine($"msg.name「{msg.name}」msg.message「{msg.message}」");
+    MessageList.Add(msg);
+    myIns.更新通知();
+    return true;
+}
+
+public void 更新通知()
+{
+    // 手動での更新通知
+    this.StateHasChanged();
+}
 
 }
