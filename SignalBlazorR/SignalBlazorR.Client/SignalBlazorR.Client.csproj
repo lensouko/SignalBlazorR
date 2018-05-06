@@ -20,20 +20,4 @@
     <ProjectReference Include="..\SignalBlazorR.Shared\SignalBlazorR.Shared.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <BlazorGenerate Remove="Pages\Chat.cshtml" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Remove="Pages\Chat.cshtml" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="Shared\Chat.cshtml" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="wwwroot\js\lib\" />
-  </ItemGroup>
-
 </Project>
