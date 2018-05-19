@@ -12,12 +12,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Blazor.Browser" Version="0.4.0-preview1-10282" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.AspNetCore.Blazor.Build" Version="0.4.0-preview1-10282" />
+    <PackageReference Include="Microsoft.AspNetCore.Blazor.Browser" Version="0.4.0-preview1-10286" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.Blazor.Build" Version="0.4.0-preview1-10286" />
+    <PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="1.0.20" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\SignalBlazorR.Shared\SignalBlazorR.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\js\lib\" />
   </ItemGroup>
 
 </Project>

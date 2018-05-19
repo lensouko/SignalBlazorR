@@ -20,7 +20,7 @@ namespace SignalBlazorR.Server.Hub
 
 		public async Task JoinGroup(SimpleMessage msg)
 		{
-			await Groups.AddAsync(Context.ConnectionId, msg.room);
+			await Groups.AddToGroupAsync(Context.ConnectionId, msg.room);
 			msg.message = $"＜「{msg.room}」グループに参加しました＞";
 			await Clients.Group(msg.room).SendAsync("AddMessage", msg);
 		}
@@ -29,7 +29,7 @@ namespace SignalBlazorR.Server.Hub
 		{
 			msg.message = $"＜「{msg.room}」グループから離脱しました＞";
 			await Clients.Group(msg.room).SendAsync("AddMessage", msg);
-			await Groups.RemoveAsync(Context.ConnectionId, msg.room);
+			await Groups.RemoveFromGroupAsync(Context.ConnectionId, msg.room);
 		}
 	}
 }

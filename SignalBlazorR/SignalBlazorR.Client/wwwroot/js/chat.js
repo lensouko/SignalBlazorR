@@ -3,23 +3,34 @@
 	console.log("DOMContentLoadedいべんとだー");
 
 	// コネクション作成
-	let connection = new signalR.HubConnection('/chathub');
+    //let connection = new signalR.HubConnection('/chathub');
+    let connection = new signalR.HubConnectionBuilder().withUrl('/chathub').build();
+    let csIns = null;
 	// 受信処理
 	connection.on('AddMessage', Msg => {
 		console.log("受信");
 		for (var key in Msg) {
 			console.log(`${key}＝${Msg[key]}`);
-		}
+        }
+        var meth = "";
+        if (csIns == null) {
+            meth = "jusin";
+            console.log("static 受信");
+        }
+        else {
+            meth = "jusini";
+            console.log("インスタンス 受信");
+        }
 		let AddMessageSMethod = Blazor.platform.findMethod(
 			"SignalBlazorR.Client",
 			"SignalBlazorR.Client.Shared",
 			"Chat",
-			"jusin"
+            meth
 		);
 		console.log(`${Msg.name}「${Msg.message}」`);
 		var ts = Blazor.platform.toDotNetString(JSON.stringify(Msg));
 		console.log(ts);
-		Blazor.platform.callMethod(AddMessageSMethod, null, [ts]);
+        Blazor.platform.callMethod(AddMessageSMethod, csIns, [ts]);
 	});
 
 	// グループ追加処理
@@ -50,5 +61,23 @@
 			console.log("接続開始");
 		})
 		.catch(e => console.log(e));
+
+    Blazor.registerFunction("Chatインスタンス取得", Msg => {
+        let GetPageObjectMethod = Blazor.platform.findMethod(
+            "SignalBlazorR.Client",
+            "SignalBlazorR.Client.Shared",
+            "Chat",
+            "GetPageObject"
+        );
+        csIns = Blazor.platform.callMethod(GetPageObjectMethod, null, []);
+        console.log(`インスタンス「${csIns}」`);
+        return true;
+    });
+
+    Blazor.registerFunction("Chatインスタンス解除", Msg => {
+        csIns = null;
+        console.log(`インスタンス「${csIns}」`);
+        return true;
+    });
 
 });

@@ -9,6 +9,7 @@
         <input type="checkbox" bind="IsAll" title="あああ" />全体発言する？
     </label>
     <button onclick="@発言">はつげん</button><br />
+    <button onclick="@SetMyIns">インスタンス設定</button><br />
 </p>
 <p>@Msg.room</p>
 <table class='table'>
@@ -31,79 +32,102 @@
 
 @functions {
 
- static SimpleMessage Msg = new SimpleMessage();
- static List<SimpleMessage> MessageList = new List<SimpleMessage>();
+    static SimpleMessage Msg = new SimpleMessage();
+    static List<SimpleMessage> MessageList = new List<SimpleMessage>();
 
- static Chat myIns;
+    static Chat myIns;
 
-string Assembly { get; set; }
-string NameSpace { get; set; }
-string Type { get; set; }
+    string Assembly { get; set; }
+    string NameSpace { get; set; }
+    string Type { get; set; }
 
-bool IsAll { get; set; } = false;
+    bool IsAll { get; set; } = false;
 
-protected override void OnInit()
-{
-    myIns = this;
-    this.Assembly = this.GetType().Assembly.GetName().Name;
-    this.NameSpace = this.GetType().Namespace;
-    this.Type = this.GetType().Name;
-    Console.Out.WriteLine($"Assembly={Assembly}\r\nNameSpace={NameSpace}\r\nType={Type}");
-    var url = new Microsoft.AspNetCore.Blazor.Browser.Services.BrowserUriHelper().GetAbsoluteUri();
-    url = $"{url}{(url.EndsWith("/") ? "index" : string.Empty)}";
-    var uri = new Uri(url);
-
-    //if (Msg.room != uri.AbsolutePath)
+    protected override void OnInit()
     {
-        Msg.room = uri.AbsolutePath;
-        RegisteredFunction.Invoke<bool>("グループ追加", Msg);
+        myIns = this;
+        this.Assembly = this.GetType().Assembly.GetName().Name;
+        this.NameSpace = this.GetType().Namespace;
+        this.Type = this.GetType().Name;
+        Console.WriteLine($"Assembly={Assembly}\r\nNameSpace={NameSpace}\r\nType={Type}");
+        var url = new Microsoft.AspNetCore.Blazor.Browser.Services.BrowserUriHelper().GetAbsoluteUri();
+        url = $"{url}{(url.EndsWith("/") ? "index" : string.Empty)}";
+        var uri = new Uri(url);
+
+        //if (Msg.room != uri.AbsolutePath)
+        {
+            Msg.room = uri.AbsolutePath;
+            this.SetMyIns();
+            RegisteredFunction.Invoke<bool>("グループ追加", Msg);
+
+        }
+
+        Console.WriteLine($"Room={Msg.room}");
+    }
+
+    public void Dispose()
+    {
+
+        if (!string.IsNullOrWhiteSpace(Msg.room))
+        {
+            this.ClearMyIns();
+            RegisteredFunction.Invoke<bool>("グループ離脱", Msg);
+        }
 
     }
 
-    Console.Out.WriteLine($"Room={Msg.room}");
-}
 
-public void Dispose()
-{
-
-    if (!string.IsNullOrWhiteSpace(Msg.room))
+    void 発言()
     {
-        RegisteredFunction.Invoke<bool>("グループ離脱", Msg);
+        var sndMsg = Msg.Clone();
+        if (this.IsAll)
+        {
+            sndMsg.room = SimpleMessage.AllGroup;
+        }
+        RegisteredFunction.Invoke<bool>("迷信", sndMsg);
     }
 
-}
-
-
-void 発言()
-{
-    var sndMsg = Msg.Clone();
-    if (this.IsAll)
+    public static bool jusin(string smsg)
     {
-        sndMsg.room = SimpleMessage.AllGroup;
+        Console.WriteLine($"smsg「{smsg}」");
+        var msg = JsonUtil.Deserialize<SimpleMessage>(smsg);
+        Console.WriteLine($"msg.name「{msg.name}」msg.message「{msg.message}」");
+        MessageList.Add(msg);
+        myIns.更新通知();
+        return true;
     }
-    RegisteredFunction.Invoke<bool>("迷信", sndMsg);
-}
 
-public static bool JsInited()
-{
-    RegisteredFunction.Invoke<bool>("グループ追加", Msg);
-    return true;
-}
+    public void 更新通知()
+    {
+        // 手動での更新通知
+        this.StateHasChanged();
+    }
 
-public static bool jusin(string smsg)
-{
-    Console.Out.WriteLine($"smsg「{smsg}」");
-    var msg = JsonUtil.Deserialize<SimpleMessage>(smsg);
-    Console.Out.WriteLine($"msg.name「{msg.name}」msg.message「{msg.message}」");
-    MessageList.Add(msg);
-    myIns.更新通知();
-    return true;
-}
+    public bool jusini(string smsg)
+    {
+        Console.WriteLine($"smsg「{smsg}」");
+        var msg = JsonUtil.Deserialize<SimpleMessage>(smsg);
+        Console.WriteLine($"msg.name「{msg.name}」msg.message「{msg.message}」");
+        MessageList.Add(msg);
+        this.StateHasChanged();
+        return true;
+    }
 
-public void 更新通知()
-{
-    // 手動での更新通知
-    this.StateHasChanged();
-}
+    private void SetMyIns()
+    {
+        Console.WriteLine("SetMyIns()");
+        RegisteredFunction.Invoke<bool>("Chatインスタンス取得", "");
+    }
+
+    private void ClearMyIns()
+    {
+        Console.WriteLine("ClearMyIns()");
+        RegisteredFunction.Invoke<bool>("Chatインスタンス解除", "");
+    }
+
+    public static BlazorComponent GetPageObject()
+    {
+        return myIns;
+    }
 
 }
