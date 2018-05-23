@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Blazor.Browser.Rendering;
 using Microsoft.AspNetCore.Blazor.Browser.Services;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 
 namespace SignalBlazorR.Client
@@ -11,6 +12,7 @@ namespace SignalBlazorR.Client
             var serviceProvider = new BrowserServiceProvider(configure =>
             {
                 // Add any custom services here
+                configure.AddSingleton<LoginService>();
             });
 
             new BrowserRenderer(serviceProvider).AddComponent<App>("app");

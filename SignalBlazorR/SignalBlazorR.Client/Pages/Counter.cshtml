@@ -1,11 +1,15 @@
 ﻿@page "/counter"
 @page "/counter/{amt:int}"
+@inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
+
 
 <h1>Counter</h1>
 
 <p>Current count: @currentCount</p>
+<p>
+    <button class="btn btn-primary" onclick="@IncrementCount">Click me</button>
+</p>
 
-<button class="btn btn-primary" onclick="@IncrementCount">Click me</button>
 
 <Chat />
 
@@ -24,4 +28,5 @@
     {
         currentCount += amt;//.Value;
     }
+
 }

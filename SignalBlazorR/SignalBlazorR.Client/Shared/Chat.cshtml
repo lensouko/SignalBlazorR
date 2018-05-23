@@ -1,41 +1,49 @@
-﻿@using SignalBlazorR.Shared;
+﻿@inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
+@inject LoginService LoginService
 @using Microsoft.AspNetCore.Blazor.Browser.Interop;
 @implements IDisposable
 
-<p>
-    名前：<input type="text" bind="Msg.name" /><br />
-    発言：<input type="text" bind="Msg.message" /><br />
-    <label>
-        <input type="checkbox" bind="IsAll" title="あああ" />全体発言する？
-    </label>
-    <button onclick="@発言">はつげん</button><br />
-    <button onclick="@SetMyIns">インスタンス設定</button><br />
-</p>
-<p>@Msg.room</p>
-<table class='table'>
-    <thead>
-        <tr>
-            <th>名前</th>
-            <th>発言</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var Message in MessageList)
-        {
+@if (string.IsNullOrWhiteSpace(LoginService.UserData?.Name))
+{
+    <button class="btn btn-primary" onclick="@ログイン画面へ移動">ログインしとくー</button>
+}
+else
+{
+    <p>
+        名前：<input type="text" bind="Msg.name" /><br />
+        発言：<input type="text" bind="Msg.message" /><br />
+        <label>
+            <input type="checkbox" bind="IsAll" title="あああ" />全体発言する？
+        </label>
+        <button onclick="@発言">はつげん</button><br />
+        <button onclick="@SetMyIns">インスタンス設定</button><br />
+    </p>
+    <p>@Msg.room</p>
+    <table class='table'>
+        <thead>
             <tr>
-                <td>@Message.name</td>
-                <td>@Message.message</td>
+                <th>名前</th>
+                <th>発言</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var Message in MessageList)
+            {
+                <tr>
+                    <td>@Message.name</td>
+                    <td>@Message.message</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
 
 @functions {
 
     static SimpleMessage Msg = new SimpleMessage();
     static List<SimpleMessage> MessageList = new List<SimpleMessage>();
 
-    static Chat myIns;
+    static BlazorComponent myIns;
 
     string Assembly { get; set; }
     string NameSpace { get; set; }
@@ -50,16 +58,17 @@
         this.NameSpace = this.GetType().Namespace;
         this.Type = this.GetType().Name;
         Console.WriteLine($"Assembly={Assembly}\r\nNameSpace={NameSpace}\r\nType={Type}");
-        var url = new Microsoft.AspNetCore.Blazor.Browser.Services.BrowserUriHelper().GetAbsoluteUri();
-        url = $"{url}{(url.EndsWith("/") ? "index" : string.Empty)}";
+        var url = UriHelper.GetAbsoluteUri();
+        //url = $"{url}{(url.EndsWith("/") ? "index" : string.Empty)}";
         var uri = new Uri(url);
 
         //if (Msg.room != uri.AbsolutePath)
+        if (!string.IsNullOrWhiteSpace(LoginService.UserData?.Name))
         {
+            Msg.name = LoginService.UserData.Name;
             Msg.room = uri.AbsolutePath;
             this.SetMyIns();
             RegisteredFunction.Invoke<bool>("グループ追加", Msg);
-
         }
 
         Console.WriteLine($"Room={Msg.room}");
@@ -68,7 +77,8 @@
     public void Dispose()
     {
 
-        if (!string.IsNullOrWhiteSpace(Msg.room))
+        if (!string.IsNullOrWhiteSpace(Msg.room)
+            && !string.IsNullOrWhiteSpace(LoginService.UserData?.Name))
         {
             this.ClearMyIns();
             RegisteredFunction.Invoke<bool>("グループ離脱", Msg);
@@ -93,7 +103,7 @@
         var msg = JsonUtil.Deserialize<SimpleMessage>(smsg);
         Console.WriteLine($"msg.name「{msg.name}」msg.message「{msg.message}」");
         MessageList.Add(msg);
-        myIns.更新通知();
+        ((Chat)myIns).更新通知();
         return true;
     }
 
@@ -128,6 +138,11 @@
     public static BlazorComponent GetPageObject()
     {
         return myIns;
+    }
+
+    void ログイン画面へ移動()
+    {
+        UriHelper.NavigateTo("/");
     }
 
 }

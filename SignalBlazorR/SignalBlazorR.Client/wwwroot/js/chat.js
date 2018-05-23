@@ -13,7 +13,7 @@
 			console.log(`${key}＝${Msg[key]}`);
         }
         var meth = "";
-        if (csIns == null) {
+        if (csIns === null) {
             meth = "jusin";
             console.log("static 受信");
         }

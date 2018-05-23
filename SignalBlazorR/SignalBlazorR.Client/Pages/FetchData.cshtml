@@ -1,6 +1,6 @@
-﻿@using SignalBlazorR.Shared
-@page "/fetchdata"
+﻿@page "/fetchdata"
 @inject HttpClient Http
+@inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
 
 <h1>Weather forecast</h1>
 
@@ -50,4 +50,5 @@ async Task UpdateForecasts()
 {
     forecasts = await Http.GetJsonAsync<WeatherForecast[]>("/api/SampleData/WeatherForecasts");
 }
+
 }
