@@ -1,19 +1,23 @@
 ﻿@page "/"
 @inject LoginService LoginService
 
-<h1>ログインしてね</h1>
-
 @if (LoginService.UserData == null)
 {
+
+    <h1>ログインしてね</h1>
+
     <p>
         名前：<input type="text" bind="loginData.ID" /><br />
         発言：<input type="text" bind="loginData.PassWord" /><br />
-        <button onclick="@ログイン">ログイン</button><br />
+        <button class="btn btn-primary"  onclick="@ログイン">ログイン</button><br />
         <span class="error">@LoginService.ErrMessagse</span>
     </p>
 }
 else
 {
+
+    <h1>ログインしたね</h1>
+
     <p>
         名前：『@LoginService.UserData.Name』さん<br />
         イラッシャイマセ
@@ -26,13 +30,13 @@ else
 
 
 @functions {
-    LoginData loginData = new LoginData();
+LoginData loginData = new LoginData();
 
-    async Task ログイン()
-    {
-        await LoginService.ログイン(loginData);
-        this.StateHasChanged();
-    }
+async Task ログイン()
+{
+    await LoginService.ログイン(loginData);
+    this.StateHasChanged();
+}
 
 }
 
