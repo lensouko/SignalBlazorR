@@ -33,6 +33,26 @@
         Blazor.platform.callMethod(AddMessageSMethod, csIns, [ts]);
 	});
 
+    window.Chat = {
+        グループ追加: Msg => {
+            console.log(`グループ追加「${Msg.room}」`);
+            connection.invoke("JoinGroup", Msg)
+                .catch(e => console.log(e));
+            return true;
+        },
+        グループ離脱: Msg => {
+            connection.invoke("LeaveGroup", Msg)
+                .catch(e => console.log(e));
+            return true;
+        },
+        迷信: Msg => {
+            connection.invoke("PostMessage", Msg)
+                .catch(e => console.log(e));
+            return true;
+        }
+    };
+
+    /*
 	// グループ追加処理
 	Blazor.registerFunction("グループ追加", Msg => {
 		console.log(`グループ追加「${Msg.room}」`);
@@ -54,6 +74,7 @@
 			.catch(e => console.log(e));
 		return true;
 	});
+    */
 
 	// 接続開始
 	connection.start()
@@ -62,6 +83,19 @@
 		})
 		.catch(e => console.log(e));
 
+    window.Chat.Chatインスタンス取得 = Msg => {
+        let GetPageObjectMethod = Blazor.platform.findMethod(
+            "SignalBlazorR.Client",
+            "SignalBlazorR.Client.Shared",
+            "Chat",
+            "GetPageObject"
+        );
+        csIns = Blazor.platform.callMethod(GetPageObjectMethod, null, []);
+        console.log(`インスタンス「${csIns}」`);
+        return true;
+    };
+
+    /*
     Blazor.registerFunction("Chatインスタンス取得", Msg => {
         let GetPageObjectMethod = Blazor.platform.findMethod(
             "SignalBlazorR.Client",
@@ -73,11 +107,19 @@
         console.log(`インスタンス「${csIns}」`);
         return true;
     });
+    */
 
+    window.Chat.Chatインスタンス解除 = Msg => {
+        csIns = null;
+        console.log(`インスタンス「${csIns}」`);
+        return true;
+    };
+
+    /*
     Blazor.registerFunction("Chatインスタンス解除", Msg => {
         csIns = null;
         console.log(`インスタンス「${csIns}」`);
         return true;
     });
-
+    */
 });

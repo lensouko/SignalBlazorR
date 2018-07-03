@@ -1,6 +1,6 @@
-﻿@inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
+﻿@using Microsoft.JSInterop
+@inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
 @inject LoginService LoginService
-@using Microsoft.AspNetCore.Blazor.Browser.Interop;
 @implements IDisposable
 
 @if (string.IsNullOrWhiteSpace(LoginService.UserData?.Name))
@@ -15,8 +15,8 @@ else
         <label>
             <input type="checkbox" bind="IsAll" title="あああ" />全体発言する？
         </label>
-        <button class="btn btn-primary"  onclick="@発言">はつげん</button><br />
-        <button class="btn btn-primary"  onclick="@SetMyIns">インスタンス設定</button><br />
+        <button class="btn btn-primary" onclick="@発言">はつげん</button><br />
+        <button class="btn btn-primary" onclick="@SetMyIns">インスタンス設定</button><br />
     </p>
     <p>@Msg.room</p>
     <table class='table'>
@@ -68,7 +68,7 @@ else
             Msg.name = LoginService.UserData.Name;
             Msg.room = uri.AbsolutePath;
             this.SetMyIns();
-            RegisteredFunction.Invoke<bool>("グループ追加", Msg);
+            JSRuntime.Current.InvokeAsync<bool>("Chat.グループ追加", Msg);
         }
 
         Console.WriteLine($"Room={Msg.room}");
@@ -81,7 +81,7 @@ else
             && !string.IsNullOrWhiteSpace(LoginService.UserData?.Name))
         {
             this.ClearMyIns();
-            RegisteredFunction.Invoke<bool>("グループ離脱", Msg);
+            JSRuntime.Current.InvokeAsync<bool>("Chat.グループ離脱", Msg);
         }
 
     }
@@ -94,13 +94,13 @@ else
         {
             sndMsg.room = SimpleMessage.AllGroup;
         }
-        RegisteredFunction.Invoke<bool>("迷信", sndMsg);
+        JSRuntime.Current.InvokeAsync<bool>("Chat.迷信", sndMsg);
     }
 
     public static bool jusin(string smsg)
     {
         Console.WriteLine($"smsg「{smsg}」");
-        var msg = JsonUtil.Deserialize<SimpleMessage>(smsg);
+        var msg = Json.Deserialize<SimpleMessage>(smsg);
         Console.WriteLine($"msg.name「{msg.name}」msg.message「{msg.message}」");
         MessageList.Add(msg);
         ((Chat)myIns).更新通知();
@@ -116,7 +116,7 @@ else
     public bool jusini(string smsg)
     {
         Console.WriteLine($"smsg「{smsg}」");
-        var msg = JsonUtil.Deserialize<SimpleMessage>(smsg);
+        var msg = Json.Deserialize<SimpleMessage>(smsg);
         Console.WriteLine($"msg.name「{msg.name}」msg.message「{msg.message}」");
         MessageList.Add(msg);
         this.StateHasChanged();
@@ -126,13 +126,13 @@ else
     private void SetMyIns()
     {
         Console.WriteLine("SetMyIns()");
-        RegisteredFunction.Invoke<bool>("Chatインスタンス取得", "");
+        JSRuntime.Current.InvokeAsync<bool>("Chat.Chatインスタンス取得", "");
     }
 
     private void ClearMyIns()
     {
         Console.WriteLine("ClearMyIns()");
-        RegisteredFunction.Invoke<bool>("Chatインスタンス解除", "");
+        JSRuntime.Current.InvokeAsync<bool>("CChat.hatインスタンス解除", "");
     }
 
     public static BlazorComponent GetPageObject()
